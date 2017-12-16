@@ -20,7 +20,7 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 1. Select the code/text you want to save.
 
-2. Right Click and click on "Add to syncrow"
+2. Right Click and click on "Add to syncrow" OR use syncrow shortcuts (See Below).
 
 3. Enter the name of the snippet. Press Enter.
 
@@ -36,9 +36,7 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 4. Navigate to Preferences > Settings.
 
-5. Add this line:
-
-"syncrow_key": "YOUR_SYNCROW_KEY"
+5. Add this line: "syncrow_key": "YOUR_SYNCROW_KEY"
 
 6. Right Click and click on sync on "Sync syncrow".
 
