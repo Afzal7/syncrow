@@ -94,9 +94,10 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		# snippet_list = open(sublime.packages_path()+'/syncrow_snippet_list.json', "w")
 
 	def create_snippet(self, snippet_content, file_name, upload):
-		while os.path.isfile(sublime.packages_path()+'/'+file_name+".sublime-snippet"):
-			sublime.status_message('Name Already Exists, Try Again :(')
-			return
+		if upload:
+			while os.path.isfile(sublime.packages_path()+'/'+file_name+".sublime-snippet"):
+				sublime.status_message('Name Already Exists, Try Again :(')
+				return
 
 		fo = open(sublime.packages_path()+'/'+file_name+".sublime-snippet", "w")
 		
