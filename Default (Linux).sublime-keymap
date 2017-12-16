@@ -1,6 +1,6 @@
 [
 { 
-	"keys": ["ctrl+alt+s"],
+	"keys": ["ctrl+alt+a"],
 	"command": "syncrow"
 }
 ]
