@@ -1,4 +1,4 @@
-# syncrow
+# Syncrow
 Create and Sync your snippets.
 
 # We are not on the Package Control. Not Yet!
