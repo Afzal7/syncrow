@@ -1,0 +1,13 @@
+[
+	{
+	    "id" : "syncrow",
+	    "caption" : "Add to syncrow",
+	    "command" : "syncrow",
+	},
+	{
+	    "id" : "syncrow",
+	    "caption" : "Sync syncrow",
+	    "command" : "syncrow",
+	    "args" : { "sync": true }
+	}
+]
