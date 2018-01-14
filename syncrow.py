@@ -17,7 +17,7 @@ def plugin_loaded():
 class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit, **args):
-		self.baseUrl = 'http://localhost:3000/'
+		self.baseUrl = 'https://syncrow.herokuapp.com/'
 		self.syncrow_key = self.view.settings().get("syncrow_key")
 		self.window = sublime.active_window()
 
