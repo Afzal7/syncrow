@@ -38,7 +38,7 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 5. Add this line: "syncrow_key": "YOUR_SYNCROW_KEY"
 
-6. Right Click and click on sync on "Sync syncrow".
+6. Right Click and click on "Sync syncrow".
 
 7. Voila!
 
