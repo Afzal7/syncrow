@@ -2,7 +2,7 @@
 
 A Sublime Text 3 Plugin. Create and Sync your snippets.
 
-# We are not on the Package Control. Not Yet!
+## We are not on the Package Control. Not Yet!
 
 # Installation
 
@@ -28,7 +28,7 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 # Enable Sync
 
-1. Visit our website https://mysterious-wildwood-55583.herokuapp.com/
+1. Visit our website syncrow.herokuapp.com
 
 2. SignUp and generate a Syncrow Key.
 
@@ -44,6 +44,6 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 # Shortcuts
 
-MacOSx: Super + Alt + S
+  MacOSx: Super + Alt + S
 
-Linux: Ctrl + Alt + A
+  Linux: Ctrl + Alt + S
