@@ -17,7 +17,7 @@ def plugin_loaded():
 class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit, **args):
-		self.baseUrl = 'http://192.168.0.114:3000/'
+		self.baseUrl = 'https://syncrow.herokuapp.com'
 		self.syncrow_key = self.view.settings().get("syncrow_key")
 		self.window = sublime.active_window()
 
@@ -57,41 +57,23 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 			return
 
 		sublime.status_message('Syncing...')
-		response = request.urlopen(self.baseUrl+"/api/v1/snippet?access_token="+self.syncrow_key)
+		response = request.urlopen(self.baseUrl+"/api/v1/users/snippets?access_key="+self.syncrow_key)
 		response_text = response.read().decode(encoding='utf-8',errors='ignore')
 		snippets = json.loads(response_text)
+
 		print(snippets)
-		sublime.status_message('Yay! Syncing completed.')
+		if snippets['success'] == True:
+			for snippet in snippets['data']:
+				self.create_snippet(snippet['content'], snippet['name'], False)
+
+			sublime.status_message('Yay! Syncing completed.')
+		else:
+			sublime.status_message('Cant sync! Invalid syncrow secret key.')
 
 		# for i in list(range(3)):
 		# 	print(snippets[i])
 
-		snippet_list = self.get_snippet_list()
-
-		for snippet in snippets:
-			self.create_snippet(snippet['content'], snippet['name'], False)
-
-		# snippet_file = open(sublime.packages_path()+'/syncrow_snippet_list.json', "w+")
-		# print(123123123)
-		# print(self.sample_snippet_list())
-		# print(123123123)
-		# snippet_file.write(self.sample_snippet_list())
-		# print(snippet_file.read())
-		# snippet_list = json.load(snippet_file)
-		# for snippet in snippet_list.values():
-		# 		print(snippet['id'], snippet['name'], snippet['content'])
-		# snippet_file.close()
-
-		# with open(sublime.packages_path()+'/syncrow_snippet_list.json', 'w+') as snippet_file:
-		# 	# print(json.dumps(self.sample_snippet_list()))
-		# 	snippet_file.write(json.dumps(self.sample_snippet_list()))
-		# with open(sublime.packages_path()+'/syncrow_snippet_list.json', 'r') as snippet_file:
-		# 	# print(snippet_file)
-		# 	snippet_list = json.loads(snippet_file.read())
-		# 	print(snippet_list)
-		# 	for snippet in snippet_list:
-		# 			print(snippet['id'], snippet['name'], snippet['content'])
-		# snippet_list = open(sublime.packages_path()+'/syncrow_snippet_list.json', "w")
+		# snippet_list = self.get_snippet_list()
 
 	def create_snippet(self, snippet_content, file_name, upload):
 		if upload:
@@ -106,7 +88,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		fo.write(snippet)
 		fo.close()
 
-		sublime.status_message('Done! Life is a little bit easy now.')
+		sublime.status_message('Done! Life is a bit easy now.')
 
 		if upload:
 			self.upload_snippet(file_name, snippet_content)
@@ -115,17 +97,19 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		if not self.syncrow_key:
 			return
 
-		data = parse.urlencode({'name': name, 'content': content}).encode()
-		req =	request.Request(self.baseUrl+'/api/v1/snippet?access_token='+self.syncrow_key, data=data)
-		response = request.urlopen(req)
-		response_text = response.read().decode(encoding='utf-8',errors='ignore')
-		snippet = json.loads(response_text)
+		data = parse.urlencode({'access_key': self.syncrow_key, 'name': name, 'content': content}).encode()
+		print(data)
+		req =	request.Request(self.baseUrl+'/api/v1/users/add_snippet', data=data)
+		response_encoded = request.urlopen(req)
+		response_decoded = response_encoded.read().decode(encoding='utf-8',errors='ignore')
+		response = json.loads(response_decoded)
 		print('-----------------')
-		print(snippet)
+		print(response)
 		print('-----------------')
-		sublime.status_message('Snippet syncing completed!')
-		syncrow_json.append(snippet)
-
+		if response['success'] == True:
+			sublime.status_message('Snippet syncing completed!')
+		else:
+			sublime.status_message('Snippet created but not synced! Check your syncrow secret key.')
 
 	def get_snippet_list(self):
 		snippet_list = []
