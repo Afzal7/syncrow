@@ -17,7 +17,7 @@ def plugin_loaded():
 class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit, **args):
-		self.baseUrl = 'https://syncrow.herokuapp.com'
+		self.baseUrl = 'http://localhost:3000/'
 		self.syncrow_key = self.view.settings().get("syncrow_key")
 		self.window = sublime.active_window()
 
@@ -38,11 +38,16 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 
 		sel = self.view.sel()[0]
 		self.selected_text = self.view.substr(sel)
+
+		if not self.selected_text:
+			sublime.status_message('Syncrow - Select something first!')
+			return
+
 		print(self.selected_text)
 		self.window.show_input_panel('Enter Snippet Name', '', self.on_done, '', '')
 
 	def on_done(self, file_name):
-		sublime.status_message('Waiting for the magic to happen...')
+		sublime.status_message('Syncrow - Waiting for the magic to happen...')
 		self.create_snippet(self.selected_text, file_name, True)
 
 	def sample_snippet_list(self):
@@ -56,7 +61,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		if not self.syncrow_key:
 			return
 
-		sublime.status_message('Syncing...')
+		sublime.status_message('Syncrow - Syncing...')
 		response = request.urlopen(self.baseUrl+"/api/v1/users/snippets?access_key="+self.syncrow_key)
 		response_text = response.read().decode(encoding='utf-8',errors='ignore')
 		snippets = json.loads(response_text)
@@ -66,9 +71,9 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 			for snippet in snippets['data']:
 				self.create_snippet(snippet['content'], snippet['name'], False)
 
-			sublime.status_message('Yay! Syncing completed.')
+			sublime.status_message('Syncrow - Yay! Syncing completed.')
 		else:
-			sublime.status_message('Cant sync! Invalid syncrow secret key.')
+			sublime.status_message('Syncrow - Cant sync! Invalid syncrow secret key.')
 
 		# for i in list(range(3)):
 		# 	print(snippets[i])
@@ -78,7 +83,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 	def create_snippet(self, snippet_content, file_name, upload):
 		if upload:
 			while os.path.isfile(sublime.packages_path()+'/'+file_name+".sublime-snippet"):
-				sublime.status_message('Name Already Exists, Try Again :(')
+				sublime.status_message('Syncrow - Name Already Exists, Try Again :(')
 				return
 
 		fo = open(sublime.packages_path()+'/'+file_name+".sublime-snippet", "w")
@@ -88,7 +93,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		fo.write(snippet)
 		fo.close()
 
-		sublime.status_message('Done! Life is a bit easy now.')
+		sublime.status_message('Syncrow - Done! Life is a bit easy now.')
 
 		if upload:
 			self.upload_snippet(file_name, snippet_content)
@@ -107,9 +112,9 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		print(response)
 		print('-----------------')
 		if response['success'] == True:
-			sublime.status_message('Snippet syncing completed!')
+			sublime.status_message('Syncrow - Snippet syncing completed!')
 		else:
-			sublime.status_message('Snippet created but not synced! Check your syncrow secret key.')
+			sublime.status_message('Syncrow - Snippet created but not synced! Check your syncrow secret key.')
 
 	def get_snippet_list(self):
 		snippet_list = []
