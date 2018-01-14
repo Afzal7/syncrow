@@ -28,7 +28,7 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 # Enable Sync
 
-1. Visit our website https://syncrow.herokuapp.com
+1. Visit https://syncrow.herokuapp.com
 
 2. SignUp and generate a Syncrow Key.
 
