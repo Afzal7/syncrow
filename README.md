@@ -26,6 +26,8 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 4. Thats it. The snippet will now appear in the autocomplete popup.
 
+![alt text](https://im3.ezgif.com/tmp/ezgif-3-37622882af.gif)
+
 # Enable Sync
 
 1. Visit https://syncrow.herokuapp.com
