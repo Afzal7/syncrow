@@ -24,9 +24,9 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 3. Enter the name of the snippet. Press Enter.
 
-4. Thats it. The snippet will now appear in the autocomplete popup.
-
 ![alt text](https://raw.githubusercontent.com/Afzal7/syncroh-rails/9f2627c4b6f10b4d637121c638c54b5a9e7b5af0/app/assets/images/set_snippet.gif)
+
+4. Thats it. The snippet will now appear in the autocomplete popup.
 
 ![alt text](https://raw.githubusercontent.com/Afzal7/syncroh-rails/9f2627c4b6f10b4d637121c638c54b5a9e7b5af0/app/assets/images/get_snippet.gif)
 
