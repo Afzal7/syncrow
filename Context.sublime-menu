@@ -5,7 +5,7 @@
 	    "command" : "syncrow",
 	},
 	{
-	    "id" : "syncrow",
+	    "id" : "sync syncrow",
 	    "caption" : "Sync syncrow",
 	    "command" : "syncrow",
 	    "args" : { "sync": true }
