@@ -1,6 +1,8 @@
 # Syncrow
 
-A Sublime Text 3 Plugin. Create and Sync your snippets.
+A Sublime Text 3 Plugin. Create and Sync your snippets. 
+
+All the snippets are synced using a third party server at https://syncrow.herokuapp.com. You can manage your snippets there.
 
 ## We are not on the Package Control. Not Yet!
 
