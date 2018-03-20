@@ -50,6 +50,6 @@ All the snippets are synced using a third party server at https://syncrow.heroku
 
 # Shortcuts
 
-  MacOSx: Super + Alt + S
+  MacOSx: Super + Shift + x
 
-  Linux: Ctrl + Alt + S
+  Linux: Ctrl + Shift + x
