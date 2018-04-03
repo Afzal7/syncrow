@@ -2,7 +2,7 @@
 
 A Sublime Text 3 Plugin. Create and Sync your snippets. 
 
-All the snippets are synced using a third party server at https://syncrow.herokuapp.com. You can manage your snippets there.
+All the snippets are synced using a third party server at http://www.syncrow.in. You can manage your snippets there.
 
 ## We are not on the Package Control. Not Yet!
 
@@ -34,7 +34,7 @@ All the snippets are synced using a third party server at https://syncrow.heroku
 
 # Enable Sync
 
-1. Visit https://syncrow.herokuapp.com
+1. Visit http://www.syncrow.in
 
 2. SignUp and generate a Syncrow Key.
 
