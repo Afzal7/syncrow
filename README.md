@@ -4,8 +4,6 @@ A Sublime Text 3 Plugin. Create and Sync your snippets.
 
 All the snippets are synced using a third party server at http://www.syncrow.in. You can manage your snippets there.
 
-## We are not on the Package Control. Not Yet!
-
 # Installation
 
 1. Clone this repo.
