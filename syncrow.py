@@ -3,6 +3,7 @@ import sublime_plugin
 from urllib import request, parse
 import json
 import os.path
+import yaml
 
 def plugin_loaded():
 	window = sublime.active_window()
@@ -17,6 +18,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit, **args):
 		self.baseUrl = 'http://www.syncrow.in/'
+		# self.baseUrl = 'http://localhost:3000'
 		self.syncrow_key = self.view.settings().get("syncrow_key")
 		self.window = sublime.active_window()
 
@@ -27,9 +29,8 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 		# print(urllib.request.urlopen(self.baseUrl+"/posts").read())
 		# window.show_quick_panel('self.view.substr(sel)', None, sublime.MONOSPACE_FONT)
 
-		print('-----------------')
-		print(self.get_snippet_list())
-		print('-----------------')
+		if not os.path.isdir(os.path.join(sublime.packages_path(),'Syncrow Snippets')):
+			os.mkdir(os.path.join(sublime.packages_path(),'Syncrow Snippets'))
 
 		if 'sync' in args and args['sync']:
 			self.sync()
@@ -47,73 +48,81 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def on_done(self, file_name):
 		self.window.status_message('Syncrow - Waiting for the magic to happen...')
-		self.create_snippet(self.selected_text, file_name, True)
-
-	def sample_snippet_list(self):
-		return [
-			{
-				"id": 1, "name": "basic-css", "content": "body" 
-			}
-		]
+		snippet = {'name': file_name, 'content': self.selected_text}
+		self.create_snippet(snippet, True)
 
 	def sync(self):
 		if not self.syncrow_key:
 			return
 
-		self.window.status_message('Syncrow - Syncing...')
-		response = request.urlopen(self.baseUrl+"/api/v1/users/snippets?access_key="+self.syncrow_key)
-		response_text = response.read().decode(encoding='utf-8',errors='ignore')
-		snippets = json.loads(response_text)
+		snippet_list = self.read_yaml()
+		snippets_to_upload = [self.get_snippet_from_file(snippet['name']) for snippet in snippet_list if snippet['id'] == None]
 
-		print(snippets)
+		for snippet in snippets_to_upload:
+			self.upload_snippet(snippet)
+
+		snippet_list = self.read_yaml() #Reloading snippet list
+		snippet_list_ids = [snippet['id'] for snippet in snippet_list if snippet['id'] != None]
+		# snippet_list_ids = ','.join(str(x) for x in snippet_list_ids)
+
+		self.window.status_message('Syncrow - Syncing...')
+
+		data = parse.urlencode({'access_key': self.syncrow_key, 'snippets_already_present': snippet_list_ids}).encode()
+
+		req =	request.Request(self.baseUrl+'/api/v1/users/sync_snippets', data=data)
+		response_encoded = request.urlopen(req)
+		response_decoded = response_encoded.read().decode(encoding='utf-8',errors='ignore')
+		snippets = json.loads(response_decoded)
+
+
+		# response = request.urlopen(self.baseUrl+"/api/v1/users/snippets?access_key="+self.syncrow_key+"&snippets_already_present="+snippet_list_ids)
+		# response_text = response.read().decode(encoding='utf-8',errors='ignore')
+		# snippets = json.loads(response_text)
+
 		if snippets['success'] == True:
 			for snippet in snippets['data']:
-				self.create_snippet(snippet['content'], snippet['name'], False)
+				self.create_snippet(snippet, False)
 
 			self.window.status_message('Syncrow - Yay! Syncing completed.')
 		else:
 			self.window.status_message('Syncrow - Cant sync! Invalid syncrow secret key.')
 
-		# for i in list(range(3)):
-		# 	print(snippets[i])
-
-		# snippet_list = self.get_snippet_list()
-
-	def create_snippet(self, snippet_content, file_name, upload):
-		if not os.path.isdir(os.path.join(sublime.packages_path(),'Syncrow Snippets')):
-			os.mkdir(os.path.join(sublime.packages_path(),'Syncrow Snippets'))
+	def create_snippet(self, snippet, upload):
 		if upload:
-			while os.path.isfile(os.path.join(sublime.packages_path(),'Syncrow Snippets',file_name+".sublime-snippet")):
+			while os.path.isfile(os.path.join(sublime.packages_path(),'Syncrow Snippets',snippet['name']+".sublime-snippet")):
 				self.window.status_message('Syncrow - Name Already Exists, Try Again :(')
 				return
 
-		fo = open(os.path.join(sublime.packages_path(),'Syncrow Snippets',file_name+".sublime-snippet"), "w")
+		fo = open(os.path.join(sublime.packages_path(),'Syncrow Snippets',snippet['name']+".sublime-snippet"), "w")
 		
-		snippet = "<snippet><content><![CDATA[%s]]></content><tabTrigger>%s</tabTrigger><description>Syncrow</description></snippet>" % (snippet_content, file_name)
+		snippet_file_content = "<snippet><content><![CDATA[%s]]></content><tabTrigger>%s</tabTrigger><description>Syncrow</description></snippet>" % (snippet['content'], snippet['name'])
 		
-		fo.write(snippet)
+		fo.write(snippet_file_content)
 		fo.close()
 
 		self.window.status_message('Syncrow - Done! Life is a bit easy now.')
 
-		if upload:
-			self.upload_snippet(file_name, snippet_content)
+		self.update_snippet_list(snippet)
 
-	def upload_snippet(self, name, content):
+		if upload:
+			self.upload_snippet(snippet)
+
+	def upload_snippet(self, snippet):
 		if not self.syncrow_key:
 			return
-
-		data = parse.urlencode({'access_key': self.syncrow_key, 'name': name, 'content': content}).encode()
+		print('2'*10)
+		data = parse.urlencode({'access_key': self.syncrow_key, 'name': snippet['name'], 'content': snippet['content']}).encode()
 		print(data)
 		req =	request.Request(self.baseUrl+'/api/v1/users/add_snippet', data=data)
 		response_encoded = request.urlopen(req)
 		response_decoded = response_encoded.read().decode(encoding='utf-8',errors='ignore')
 		response = json.loads(response_decoded)
-		print('-----------------')
+		print('=================')
 		print(response)
-		print('-----------------')
+		print('=================')
 		if response['success'] == True:
-			self.window.status_message('Syncrow - Snippet syncing completed!')
+			self.window.status_message('Syncrow - Syncing completed!')
+			self.update_snippet_id(response['data'])
 		else:
 			self.window.status_message('Syncrow - Snippet created but not synced! Check your syncrow secret key.')
 
@@ -125,3 +134,45 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 				# print(os.path.join("/mydir", file))
 
 		return snippet_list
+
+	def get_snippet_from_file(self, snippet_name):
+		for file in os.listdir(os.path.join(sublime.packages_path(),'Syncrow Snippets')):
+			print(file)
+			if file == snippet_name+".sublime-snippet":
+				return {'name': snippet_name, 'content': open(os.path.join(sublime.packages_path(),'Syncrow Snippets',file), 'r').read()}
+
+	def update_snippet_list(self, snippet):
+		snippet_list = self.read_yaml() or []
+		
+		new_snippet = {'id': snippet.get('id'), 'name': snippet['name']}
+		snippet_list.append(new_snippet)
+		
+		self.write_yaml(snippet_list)
+
+	def update_snippet_id(self, snippet):
+		snippet_list = self.read_yaml() or []
+		
+		# new_snippet = {'id': snippet.get('id'), 'name': snippet['name']}
+		# snippet_list.append(new_snippet)
+
+		for item in snippet_list:
+			if item['name'] == snippet['name']:
+				item['id'] = snippet['id']
+		
+		self.write_yaml(snippet_list)
+
+	def read_yaml(self):
+		if os.path.exists(os.path.join(sublime.packages_path(),'Syncrow Snippets',"index.yaml")):
+			file = open(os.path.join(sublime.packages_path(),'Syncrow Snippets',"index.yaml"), "r")
+		else:
+			file = open(os.path.join(sublime.packages_path(),'Syncrow Snippets',"index.yaml"), "w+")
+		
+		snippet_list = yaml.load(file)
+		file.close()
+		
+		return snippet_list or []
+
+	def write_yaml(self, data):
+		file = open(os.path.join(sublime.packages_path(),'Syncrow Snippets',"index.yaml"), "w")
+		yaml.dump(data, file, default_flow_style=False)
+		file.close()
