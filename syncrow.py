@@ -48,7 +48,7 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 
 	def on_done(self, file_name):
 		self.window.status_message('Syncrow - Waiting for the magic to happen...')
-		snippet = {'name': file_name, 'content': self.selected_text}
+		snippet = {'name': file_name, 'content': self.sanitize_text(self.selected_text)}
 		self.create_snippet(snippet, True)
 
 	def sync(self):
@@ -125,6 +125,9 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 			self.update_snippet_id(response['data'])
 		else:
 			self.window.status_message('Syncrow - Snippet created but not synced! Check your syncrow secret key.')
+
+	def sanitize_text(self, text):
+		return text.replace('$','\$')
 
 	def get_snippet_list(self):
 		snippet_list = []
