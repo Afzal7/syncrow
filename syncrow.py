@@ -4,6 +4,7 @@ from urllib import request, parse
 import json
 import os.path
 import yaml
+import re
 
 def plugin_loaded():
 	window = sublime.active_window()
@@ -127,7 +128,8 @@ class SyncrowCommand(sublime_plugin.TextCommand):
 			self.window.status_message('Syncrow - Snippet created but not synced! Check your syncrow secret key.')
 
 	def sanitize_text(self, text):
-		return text.replace('$','\$')
+		# return text.replace('$','\$')
+		return re.sub(r'\$[^\$\{]', '\$', text)
 
 	def get_snippet_list(self):
 		snippet_list = []
